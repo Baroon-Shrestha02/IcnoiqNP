@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Langit";
+  src: url("../src/Fonts/frizon.ttf") format("truetype");
+}
+
+.logo {
+  font-family: "Langit", sans-serif;
+}
