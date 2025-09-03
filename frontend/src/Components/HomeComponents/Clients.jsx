@@ -203,15 +203,6 @@ export default function Clients() {
                   className={`absolute inset-0 bg-gradient-to-br ${client.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-2xl`}
                 ></div>
 
-                {/* Category Badge */}
-                <div className="absolute top-4 right-4">
-                  <span
-                    className={`px-3 py-1 text-xs font-medium bg-gradient-to-r ${client.color} text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0`}
-                  >
-                    {client.category}
-                  </span>
-                </div>
-
                 {/* Client Logo/Title */}
                 <div className="relative z-10">
                   <h3

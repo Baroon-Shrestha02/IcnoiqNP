@@ -108,12 +108,12 @@ export default function BlogDescription() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       {/* Reading Progress Bar */}
-      <div className="fixed top-0 left-0 w-full h-1 bg-slate-200 z-50">
+      {/* <div className="fixed top-0 left-0 w-full h-1 bg-slate-200 z-50">
         <div
           className="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-300 ease-out"
           style={{ width: `${scrollProgress}%` }}
         />
-      </div>
+      </div> */}
 
       {/* Navigation Header */}
       <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/50">
@@ -149,7 +149,7 @@ export default function BlogDescription() {
                       {blog.categories.slice(0, 3).map((category, i) => (
                         <span
                           key={i}
-                          className="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium text-white bg-white/20 backdrop-blur-sm rounded-full border border-white/30"
+                          className="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium text-white bg-black/20 backdrop-blur-sm rounded-full border border-white/30"
                         >
                           <Tag className="w-3 h-3" />
                           {category}
@@ -157,12 +157,12 @@ export default function BlogDescription() {
                       ))}
                     </div>
                   )}
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight capitalize">
+                  <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight capitalize">
                     {blog.title}
                   </h1>
-                  <p className="text-white font-bolder text-base md:text-lg max-w-4xl">
+                  {/* <p className="text-white font-bolder text-base md:text-lg max-w-4xl">
                     {blog.shortDescription}
-                  </p>
+                  </p> */}
                 </div>
               </div>
             </div>

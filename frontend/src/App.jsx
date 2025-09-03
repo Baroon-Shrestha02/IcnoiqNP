@@ -27,6 +27,7 @@ import { useAuth } from "./Components/Context/useAuth";
 import BlogUpdateForm from "./Components/BlogComponents/BlogUpdateForm";
 import Terms from "./Pages/Terms";
 import NotFound from "./Components/HelperComponents/NotFound";
+import Navbar from "./Components/Navbar";
 
 export default function App() {
   const [adminState, setAdminState] = useState(null);
@@ -60,8 +61,9 @@ export default function App() {
 
         {/* Conditionally render Nav */}
         {/* {!shouldHideLayout && <Nav />} */}
-        <Nav />
+        {/* <Nav /> */}
 
+        <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />

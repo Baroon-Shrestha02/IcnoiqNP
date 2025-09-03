@@ -13,6 +13,8 @@ import {
   FaCheck,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
+import api from "../Utils/api";
+import { LucideCircleCheckBig, Send } from "lucide-react";
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -33,48 +35,38 @@ export default function ContactForm() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Your WhatsApp number with country code for Nepal (977)
-    const phoneNumber = "9779864687572";
-
-    // Build WhatsApp message
-    const whatsappMessage = `
-    
-    ──────────────────────────────
-    Full Name: ${formData.firstName} ${formData.lastName}
-    Email Address: ${formData.email}
-    Phone Number: ${formData.number}
-    Subject: ${formData.subject}
-    
-    Message:
-    ${formData.message}
-    
-    Submitted On: ${new Date().toLocaleString()}
-    ──────────────────────────────
-    Please follow up with this inquiry as soon as possible.
-    `;
-
-    // Encode message for URL
-    const encodedMessage = encodeURIComponent(whatsappMessage);
-
-    // WhatsApp link
-    const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-
-    // Open WhatsApp
-    window.open(whatsappLink, "_blank");
-
-    // Reset form and show submitted state
     setSubmitted(true);
-    setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      subject: "",
-      message: "",
-    });
-    setTimeout(() => setSubmitted(false), 3000);
+
+    try {
+      // Send data to your backend (Axios already parses response)
+      const response = await api.post("/send-mail", formData);
+
+      const result = response.data; // ✅ Axios stores data here
+
+      if (result.success) {
+        toast.success("Email sent successfully!");
+
+        // Optional: also send to WhatsApp
+        // Reset form
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          number: "",
+          subject: "",
+          message: "",
+        });
+      } else {
+        toast.error("Failed to send email. Try again!");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong!");
+    } finally {
+      setTimeout(() => setSubmitted(false), 3000);
+    }
   };
 
   return (
@@ -243,7 +235,7 @@ export default function ContactForm() {
               </h2>
               <p className="text-gray-600 text-lg">
                 Fill out the form below and we'll get back to you within 24
-                hours. We're excited to hear about your project!
+                hours. We're excited to hear about your Queries!
               </p>
             </motion.div>
 
@@ -321,7 +313,7 @@ export default function ContactForm() {
               <motion.div whileFocus={{ scale: 1.02 }} className="group">
                 <textarea
                   name="message"
-                  placeholder="Tell us about your project..."
+                  placeholder="Tell us about your Queries..."
                   rows="6"
                   value={formData.message}
                   onChange={handleInputChange}
@@ -339,13 +331,13 @@ export default function ContactForm() {
               >
                 {submitted ? (
                   <>
-                    <FaCheck className="text-white" />
+                    <LucideCircleCheckBig className="text-white" />
                     <span>Message Sent!</span>
                   </>
                 ) : (
                   <>
-                    <FaUsers className="text-white" />
-                    <span>Send via WhatsApp</span>
+                    <Send className="text-white" />
+                    <span>Send Message</span>
                   </>
                 )}
               </motion.button>

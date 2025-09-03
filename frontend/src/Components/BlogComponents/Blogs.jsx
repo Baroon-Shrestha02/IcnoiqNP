@@ -578,19 +578,19 @@ export default function Blogs() {
 
                           {/* Content Overlay */}
                           <div className="absolute bottom-0 left-0 right-0 p-8">
-                            <h3 className="text-3xl font-bold text-white mb-4 leading-tight">
+                            <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">
                               {featuredBlogs[0].title}
                             </h3>
-                            <p className="text-gray-200 text-lg mb-4 leading-relaxed">
+                            {/* <p className="text-gray-200 text-lg mb-4 leading-relaxed">
                               {getShortPreview(
                                 featuredBlogs[0].shortDescription,
                                 30
                               )}
-                            </p>
+                            </p> */}
                             <div className="flex items-center gap-4 text-white/80 text-sm">
                               <div className="flex items-center gap-2">
                                 <User className="w-4 h-4" />
-                                <span>Iconiq</span>
+                                <span>Admin</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4" />
@@ -643,7 +643,7 @@ export default function Blogs() {
                             <div className="flex items-center gap-3 text-xs text-gray-500">
                               <div className="flex items-center gap-1">
                                 <User className="w-3 h-3" />
-                                <span>Iconiq</span>
+                                <span>Admin</span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
@@ -717,7 +717,7 @@ export default function Blogs() {
                           <div className="flex items-center gap-4 text-sm text-gray-500">
                             <div className="flex items-center gap-1">
                               <User className="w-4 h-4" />
-                              <span>Iconiq</span>
+                              <span>Admin</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Clock className="w-4 h-4" />
