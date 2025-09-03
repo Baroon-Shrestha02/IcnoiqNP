@@ -29,7 +29,7 @@ const teamData = [
     role: "Sr. Graphics Designer",
     img: "Uploads/Niraj.jpg",
     description:
-      "Niroj Maharjan is a creative Sr. Graphics Designer, bringing visual ideas to life through thoughtful design and branding. His expertise spans digital illustrations, marketing assets, and UI visuals, ensuring brand consistency across platforms. By producing impactful designs, he has helped strengthen the company’s identity and attract client engagement.",
+      "Niroj Maharjan is a creative Graphics Designer, bringing visual ideas to life through thoughtful design and branding. His expertise spans digital illustrations, marketing assets, and UI visuals, ensuring brand consistency across platforms. By producing impactful designs, he has helped strengthen the company’s identity and attract client engagement.",
   },
   {
     id: 5,

@@ -14,9 +14,10 @@ import {
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import api from "../Utils/api";
-import { LucideCircleCheckBig, Send } from "lucide-react";
+import { Loader2, LucideCircleCheckBig, Send } from "lucide-react";
 
 export default function ContactForm() {
+  const [sending, setSending] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -37,19 +38,14 @@ export default function ContactForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSending(true); // Start sending animation
 
     try {
-      // Send data to your backend (Axios already parses response)
       const response = await api.post("/send-mail", formData);
-
-      const result = response.data; // ✅ Axios stores data here
+      const result = response.data;
 
       if (result.success) {
         toast.success("Email sent successfully!");
-
-        // Optional: also send to WhatsApp
-        // Reset form
         setFormData({
           firstName: "",
           lastName: "",
@@ -58,6 +54,7 @@ export default function ContactForm() {
           subject: "",
           message: "",
         });
+        setSubmitted(true);
       } else {
         toast.error("Failed to send email. Try again!");
       }
@@ -65,6 +62,7 @@ export default function ContactForm() {
       console.error(error);
       toast.error("Something went wrong!");
     } finally {
+      setSending(false); // Stop sending animation
       setTimeout(() => setSubmitted(false), 3000);
     }
   };
@@ -327,9 +325,11 @@ export default function ContactForm() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
                 className="w-full py-4 px-8 bg-gradient-to-r from-[#C848C1] to-[#54A6F9] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-lg flex items-center justify-center space-x-2"
-                disabled={submitted}
+                disabled={sending || submitted}
               >
-                {submitted ? (
+                {sending ? (
+                  <Loader2 className="animate-spin text-white" />
+                ) : submitted ? (
                   <>
                     <LucideCircleCheckBig className="text-white" />
                     <span>Message Sent!</span>

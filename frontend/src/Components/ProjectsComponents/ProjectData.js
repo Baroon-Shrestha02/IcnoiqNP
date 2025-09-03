@@ -32,6 +32,11 @@ const projectsData = [
       "Uploads/works/momiji/img7.jpg",
       "Uploads/works/momiji/img8.jpg",
       "Uploads/works/momiji/img9.jpg",
+
+      "Uploads/works/momiji/img11.jpg",
+      "Uploads/works/momiji/img12.jpg",
+      "Uploads/works/momiji/img13.jpg",
+      "Uploads/works/momiji/img14.jpg",
     ],
   },
   {
@@ -85,6 +90,11 @@ const projectsData = [
     mediaAssets: [
       "Uploads/works/kings/img1.jpg",
       "Uploads/works/kings/img2.jpg",
+      "Uploads/works/kings/img6.jpg",
+      "Uploads/works/kings/img3.jpg",
+      "Uploads/works/kings/img4.png",
+      "Uploads/works/kings/img5.jpg",
+      "Uploads/works/kings/img7.jpg",
     ],
   },
   {
@@ -163,7 +173,16 @@ const projectsData = [
       "We developed a responsive e-commerce site with product filtering, easy ordering, and mobile-first design.",
     result:
       "Ghar Sansar experienced growth in online orders and reduced dependency on physical foot traffic.",
-    mediaAssets: ["Uploads/works/ghar/img1.jpg", "Uploads/works/ghar/img2.jpg"],
+    mediaAssets: [
+      "Uploads/works/ghar/img1.jpg",
+      "Uploads/works/ghar/img2.jpg",
+      "Uploads/works/ghar/img3.jpg",
+      "Uploads/works/ghar/img4.jpg",
+      "Uploads/works/ghar/img5.jpg",
+      "Uploads/works/ghar/img6.jpg",
+      "Uploads/works/ghar/img7.jpg",
+      "Uploads/works/ghar/img8.jpg",
+    ],
   },
   {
     image: "Uploads/nisani.jpg",
@@ -234,6 +253,9 @@ const projectsData = [
       "Uploads/works/sarkar/img6.jpg",
       "Uploads/works/sarkar/img7.jpg",
       "Uploads/works/sarkar/img8.jpg",
+      "Uploads/works/sarkar/img9.jpg",
+      "Uploads/works/sarkar/img10.jpg",
+      "Uploads/works/sarkar/img11.jpg",
       "Uploads/works/sarkar/vid1.mp4",
     ],
   },

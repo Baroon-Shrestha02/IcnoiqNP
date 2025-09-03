@@ -100,8 +100,13 @@ export default function AllProjects() {
     position: { x: 0, y: 0 },
     text: "View Project",
   });
+  const [showAllMedia, setShowAllMedia] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [loadingMedia, setLoadingMedia] = useState(false);
+  const [visibleCounts, setVisibleCounts] = useState({});
+  const [loadingStates, setLoadingStates] = useState({});
+
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 1024
   );
@@ -129,6 +134,22 @@ export default function AllProjects() {
       })),
     ];
   }, []);
+
+  const handleLoadMore = (projectKey, totalAssets) => {
+    setLoadingStates((prev) => ({ ...prev, [projectKey]: true }));
+
+    setTimeout(() => {
+      setVisibleCounts((prev) => {
+        const current = prev[projectKey] || 6;
+        return {
+          ...prev,
+          [projectKey]: Math.min(current + 6, totalAssets),
+        };
+      });
+
+      setLoadingStates((prev) => ({ ...prev, [projectKey]: false }));
+    }, 1200);
+  };
 
   // Filter projects based on active category
   const filteredProjects = useMemo(() => {
@@ -219,6 +240,22 @@ export default function AllProjects() {
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
+    };
+  }, [selectedProject]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setSelectedProject(null); // close modal
+      }
+    };
+
+    if (selectedProject) {
+      document.addEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [selectedProject]);
 
@@ -340,16 +377,17 @@ export default function AllProjects() {
             >
               {/* Close button */}
               <motion.button
-                className="fixed top-6 right-6 z-[10000] text-white hover:text-gray-300 transition-colors p-2 rounded-full bg-white/10 backdrop-blur-sm"
+                className="fixed top-6 right-6 -translat-x-1/2 z-[10000] flex items-center gap-2 text-white hover:text-gray-300 transition-colors px-4 py-2 rounded-full bg-red-600 backdrop-blur-sm"
                 onClick={handleCloseModal}
-                initial={{ opacity: 0, scale: 0.8, rotate: -180 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                exit={{ opacity: 0, scale: 0.8, rotate: 180 }}
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ delay: 0.2 }}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
-                <X size={24} />
+                <X size={20} />
+                <span className="text-sm">Esc to close</span>
               </motion.button>
 
               <div className="min-h-screen flex flex-col">
@@ -514,71 +552,6 @@ export default function AllProjects() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.55, duration: 0.6 }}
                   >
-                    {selectedProject.longDescription && (
-                      <motion.div
-                        className="space-y-6 container mx-auto px-4 md:px-6 py-8 bg-black/40 backdrop-blur rounded-2xl shadow-lg"
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3, duration: 0.6 }}
-                      >
-                        {/* Main Heading */}
-                        <motion.h2
-                          className="text-2xl md:text-3xl font-bold text-white"
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.4, duration: 0.5 }}
-                        >
-                          Works for {selectedProject.title}
-                        </motion.h2>
-
-                        {/* Section 1: About the Client */}
-                        <motion.div
-                          className="space-y-2"
-                          initial={{ opacity: 0, y: 15 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.5, duration: 0.5 }}
-                        >
-                          <h3 className="text-lg md:text-xl font-bold text-gray-300">
-                            About {selectedProject.title}
-                          </h3>
-                          <p className="text-base md:text-lg text-gray-200 leading-relaxed text-justify">
-                            {selectedProject.longDescription}
-                          </p>
-                        </motion.div>
-
-                        {/* Section 2: What We Did */}
-                        <motion.div
-                          className="space-y-2"
-                          initial={{ opacity: 0, y: 15 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.6, duration: 0.5 }}
-                        >
-                          <h3 className="text-lg md:text-xl font-bold text-gray-300">
-                            Our Approach & Solution
-                          </h3>
-                          <p className="text-base md:text-lg text-gray-200 leading-relaxed text-justify">
-                            {selectedProject.longDescription1}
-                          </p>
-                        </motion.div>
-
-                        {/* Section 3: Outcome */}
-                        <motion.div
-                          className="space-y-2"
-                          initial={{ opacity: 0, y: 15 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.7, duration: 0.5 }}
-                        >
-                          <h3 className="text-lg md:text-xl font-bold text-gray-300">
-                            Results & Impact
-                          </h3>
-                          <p className="text-base md:text-lg text-gray-200 leading-relaxed text-justify">
-                            {selectedProject.longDescription2}
-                          </p>
-                        </motion.div>
-                      </motion.div>
-                    )}
-
-                    {/* Tags */}
                     <motion.div
                       className="flex flex-col"
                       initial={{ opacity: 0, y: 20 }}
@@ -603,6 +576,76 @@ export default function AllProjects() {
                         ))}
                       </div>
                     </motion.div>
+                    {selectedProject.longDescription && (
+                      <motion.div
+                        className="space-y-6 container mx-auto px-4 md:px-6 py-8 bg-black/40 backdrop-blur rounded-2xl shadow-lg"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ delay: 0.3, duration: 0.6 }}
+                      >
+                        {/* Main Heading */}
+                        <motion.h2
+                          className="text-2xl md:text-3xl font-bold text-white"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.4, duration: 0.5 }}
+                        >
+                          About {selectedProject.title}
+                        </motion.h2>
+
+                        {/* Section 1: About the Client */}
+                        <motion.div
+                          className="space-y-2"
+                          initial={{ opacity: 0, y: 15 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.5, duration: 0.5 }}
+                        >
+                          <h3 className="text-lg md:text-xl font-extrabold text-gray-300">
+                            {selectedProject.title}
+                          </h3>
+                          <p className="text-base md:text-lg text-gray-200 leading-relaxed text-justify">
+                            {selectedProject.longDescription}
+                          </p>
+                        </motion.div>
+
+                        {/* Section 2: What We Did */}
+                        <motion.div
+                          className="space-y-2"
+                          initial={{ opacity: 0, y: 15 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.6, duration: 0.5 }}
+                        >
+                          <h3 className="text-lg md:text-xl font-extrabold text-gray-300">
+                            Our Approach & Solution
+                          </h3>
+                          <p className="text-base md:text-lg text-gray-200 leading-relaxed text-justify">
+                            {selectedProject.longDescription1}
+                          </p>
+                        </motion.div>
+
+                        {/* Section 3: Outcome */}
+                        <motion.div
+                          className="space-y-2"
+                          initial={{ opacity: 0, y: 15 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.7, duration: 0.5 }}
+                        >
+                          <h3 className="text-lg md:text-xl font-extrabold text-gray-300">
+                            Results & Impact
+                          </h3>
+                          <p className="text-base md:text-lg text-gray-200 leading-relaxed text-justify">
+                            {selectedProject.longDescription2}
+                          </p>
+                        </motion.div>
+                      </motion.div>
+                    )}
+
+                    {/* Tags */}
                   </motion.div>
                   {selectedProject.mediaAssets &&
                     selectedProject.mediaAssets.length > 0 && (
@@ -610,28 +653,59 @@ export default function AllProjects() {
                         <h2 className="text-white text-2xl md:text-3xl font-bold mb-6">
                           Project Visuals & Media
                         </h2>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                          {selectedProject.mediaAssets.map((media, i) =>
-                            media.endsWith(".mp4") ? (
-                              <video
-                                key={i}
-                                src={media}
-                                autoPlay
-                                muted
-                                loop
-                                playsInline
-                                className="rounded-lg w-full h-auto max-h-[300px] object-cover"
-                              />
-                            ) : (
-                              <img
-                                key={i}
-                                src={media}
-                                alt={`media-${i}`}
-                                className="rounded-lg w-full h-auto max-h-[300px] object-cover"
-                              />
-                            )
-                          )}
+                          {selectedProject.mediaAssets
+                            .slice(0, visibleCounts[selectedProject.title] || 6)
+                            .map((media, i) =>
+                              media.endsWith(".mp4") ? (
+                                <video
+                                  key={i}
+                                  src={media}
+                                  autoPlay
+                                  muted
+                                  loop
+                                  playsInline
+                                  className="rounded-lg w-full h-auto max-h-[300px] object-cover"
+                                />
+                              ) : (
+                                <img
+                                  key={i}
+                                  src={media}
+                                  alt={`media-${i}`}
+                                  className="rounded-lg w-full h-auto max-h-[300px] object-cover"
+                                />
+                              )
+                            )}
                         </div>
+
+                        {/* Loader */}
+                        {loadingStates[selectedProject.title] && (
+                          <div className="flex justify-center mt-6">
+                            <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          </div>
+                        )}
+
+                        {/* Load More Button */}
+                        {!loadingStates[selectedProject.title] &&
+                          (visibleCounts[selectedProject.title] || 6) <
+                            selectedProject.mediaAssets.length && (
+                            <div className="flex justify-center mt-6">
+                              <button
+                                onClick={() =>
+                                  handleLoadMore(
+                                    selectedProject.title,
+                                    selectedProject.mediaAssets.length
+                                  )
+                                }
+                                className="relative overflow-hidden px-6 py-2 text-white font-medium group"
+                              >
+                                <span className="relative z-10">Load More</span>
+                                <span className="absolute left-0 bottom-0 h-[2px] w-0 bg-white transition-all duration-300 group-hover:w-full"></span>
+                                <span className="absolute left-0 bottom-0 w-full h-0 bg-gradient-to-r from-purple-600 to-blue-600 text-white transition-all duration-300 delay-300 group-hover:h-full"></span>
+                              </button>
+                            </div>
+                          )}
                       </div>
                     )}
                 </motion.div>
