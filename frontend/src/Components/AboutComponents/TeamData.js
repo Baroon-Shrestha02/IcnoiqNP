@@ -18,7 +18,7 @@ const teamData = [
   {
     id: 3,
     name: "Sara Lamichhane",
-    role: "Content Manager",
+    role: "Web Developer",
     img: "/Uploads/sara.jpeg",
     description:
       "Sara Lamichhane is an experienced Manager skilled in overseeing projects, coordinating teams, and ensuring smooth operations. She has been a driving force in strategic planning and communication, ensuring that projects are delivered on time and exceed client expectations. Her leadership has been crucial in guiding the team toward consistent, high-quality results.",

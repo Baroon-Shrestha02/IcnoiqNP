@@ -285,7 +285,7 @@ const projectsData = [
     mediaAssets: [],
   },
   {
-    image: "Uploads/works/gsr/gsr.png",
+    image: "Uploads/works/gsr/gsr2.png",
     title: "GSR Educational Consultancy",
     subtitle: "Study Abroad Consultancy",
     link: "https://gsreducation.com",
@@ -335,7 +335,7 @@ const projectsData = [
     mediaAssets: [],
   },
   {
-    image: "Uploads/works/sherpa/sherpa.png",
+    image: "Uploads/works/sherpa/sherpa2.png",
     title: "Hotel Sherpa Soul",
     subtitle: "Home Stay",
     link: "https://hotelsherpasoul.com",

@@ -1,42 +1,48 @@
 const cloudinary = require("cloudinary");
 
-const uploadImages = async (images) => {
+const uploadFiles = async (files) => {
   const allowedExtensions = [
     "image/png",
     "image/jpeg",
     "image/jpg",
     "image/webp",
     "image/avif",
+    "application/pdf",
+    "application/msword", // .doc
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
   ];
 
-  const imageArray = Array.isArray(images) ? images : [images];
-  const isSingleImage = imageArray.length === 1;
+  const fileArray = Array.isArray(files) ? files : [files];
+  const isSingleFile = fileArray.length === 1;
 
-  const uploadedImages = [];
+  const uploadedFiles = [];
 
-  for (const image of imageArray) {
-    if (!allowedExtensions.includes(image.mimetype)) {
-      throw new Error("Invalid image extension");
+  for (const file of fileArray) {
+    if (!allowedExtensions.includes(file.mimetype)) {
+      throw new Error(`Invalid file type: ${file.mimetype}`);
     }
 
     try {
-      const result = await cloudinary.uploader.upload(image.tempFilePath);
+      const result = await cloudinary.uploader.upload(file.tempFilePath, {
+        folder: "inquiries",
+        resource_type: "auto", // handles pdf, docx, etc.
+      });
 
       if (!result || result.error) {
-        throw new Error("Error uploading the image");
+        throw new Error("Error uploading the file");
       }
 
-      uploadedImages.push({
+      uploadedFiles.push({
         public_id: result.public_id,
         url: result.secure_url,
       });
     } catch (error) {
-      console.error("Error uploading image:", error);
-      throw new Error("An error occurred while uploading images");
+      console.error("Error uploading file:", error);
+      throw new Error("An error occurred while uploading files");
     }
   }
 
-  return isSingleImage ? uploadedImages[0] : uploadedImages;
+  return isSingleFile ? uploadedFiles[0] : uploadedFiles;
 };
 
-module.exports = { uploadImages };
+module.exports = { uploadFiles };

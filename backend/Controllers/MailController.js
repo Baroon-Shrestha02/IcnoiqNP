@@ -11,7 +11,7 @@ const sendmail = async (req, res) => {
       service: "gmail",
       auth: {
         user: "baroonshrestha4@gmail.com", // your Gmail
-        pass: "oybdptwbcynqwekh", // App password (not your real Gmail password)
+        pass: process.env.app_pass, // App password (not your real Gmail password)
       },
     });
 

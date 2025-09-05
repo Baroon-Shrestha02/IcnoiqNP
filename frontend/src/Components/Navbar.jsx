@@ -48,7 +48,7 @@ export default function Nav() {
   const navItems = [
     { path: "/", label: "Home" },
     { path: "/about", label: "About Us" },
-    { path: "/project", label: "Work" },
+    { path: "/project", label: "Works" },
     { path: "/services", label: "Services" },
     { path: "/pricing", label: "Pricing" },
     { path: "/blog", label: "Blogs" },
@@ -131,7 +131,7 @@ export default function Nav() {
           <div className="flex items-center justify-between lg:justify-around py-4 px-6 lg:px-0">
             {/* Logo */}
             <Link to="/">
-              <div className="logo text-4xl">
+              <div className="logo text-4xl bg-gradient-to-b from-[#C848C1] to-[#54A6F9] text-transparent bg-clip-text">
                 <p>IconiQ</p>
               </div>
             </Link>

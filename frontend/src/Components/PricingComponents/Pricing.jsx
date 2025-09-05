@@ -14,11 +14,14 @@ import {
   FaInstagram,
   FaTiktok,
 } from "react-icons/fa";
+import api from "../Utils/api";
+import { Newspaper } from "lucide-react";
 
 export default function Pricing() {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -31,9 +34,16 @@ export default function Pricing() {
   useEffect(() => {
     if (modalOpen) {
       document.body.classList.add("overflow-hidden");
+      document.documentElement.classList.add("overflow-hidden");
     } else {
       document.body.classList.remove("overflow-hidden");
+      document.documentElement.classList.remove("overflow-hidden");
     }
+
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+      document.documentElement.classList.remove("overflow-hidden");
+    };
   }, [modalOpen]);
 
   const services = [
@@ -220,7 +230,7 @@ export default function Pricing() {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validate required fields
     if (
       !formData.name ||
@@ -232,45 +242,41 @@ export default function Pricing() {
       return;
     }
 
-    // Generate WhatsApp message based on service type and form data
-    let message = `Hello! I'm interested in the "${selectedService.title}" package.\n\n`;
-    message += `Name: ${formData.name}\n`;
-    message += `Email: ${formData.email}\n`;
-    message += `Phone: ${formData.phone}\n`;
+    try {
+      setIsSubmitting(true);
+      const submissionData = new FormData();
+      submissionData.append("name", formData.name);
+      submissionData.append("email", formData.email);
+      submissionData.append("phone", formData.phone);
+      submissionData.append("description", formData.description);
+      submissionData.append("service", selectedService.title);
+      submissionData.append("price", selectedService.price);
 
-    if (
-      selectedService.type === "social-media" ||
-      selectedService.type === "social-growth" ||
-      selectedService.type === "ads"
-    ) {
       if (formData.platforms.length > 0) {
-        message += `Platforms: ${
-          formData.platforms.includes("all")
-            ? "All Platforms"
-            : formData.platforms
-                .map((p) => platformOptions.find((opt) => opt.id === p)?.name)
-                .join(", ")
-        }\n`;
+        submissionData.append("platforms", JSON.stringify(formData.platforms));
       }
+
+      if (formData.projectFile) {
+        submissionData.append("file", formData.projectFile);
+      }
+
+      // send to backend
+      const res = await api.post(`/pricing-mail`, submissionData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.data.success) {
+        alert("Your inquiry has been sent successfully ✅");
+        closeModal();
+      } else {
+        alert("Failed to send inquiry ❌");
+      }
+    } catch (error) {
+      console.error("Error submitting inquiry:", error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    if (formData.description) {
-      message += `Project Description: ${formData.description}\n`;
-    }
-
-    if (formData.projectFile) {
-      message += `Note: I have project files to share\n`;
-    }
-
-    message += `\nCould you provide more details about this service?`;
-
-    const phoneNumber = "9864687572";
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-      message
-    )}`;
-    window.open(url, "_blank");
-
-    closeModal();
   };
 
   const renderFormFields = () => {
@@ -408,7 +414,7 @@ export default function Pricing() {
             onChange={handleInputChange}
             required
             rows="4"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent custom-scrollbar"
             placeholder={getDescriptionPlaceholder(serviceType)}
           />
         </div>
@@ -436,189 +442,299 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 py-20">
-      {/* Header Section */}
-      <div className="container mx-auto px-4 mb-16">
-        <div className="flex items-center flex-col gap-6">
-          <h1 className="text-4xl md:text-6xl text-center font-black text-gray-900 leading-tight">
-            Pricing That
-            <span className="bg-gradient-to-b from-[#C848C1] to-[#54A6F9] bg-clip-text text-transparent">
-              {" "}
-              Delivers Results
-            </span>
-          </h1>
-          <p className="text-lg md:text-xl font-extralight text-center max-w-3xl text-gray-600 leading-relaxed">
-            Choose the perfect package to elevate your brand and dominate your
-            market. Every service is designed to deliver measurable results and
-            exceptional ROI.
-          </p>
+    <>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 py-20">
+        {/* Header Section */}
+        <div className="container mx-auto px-4 mb-16">
+          <div className="flex items-center flex-col gap-6">
+            <h1 className="text-4xl md:text-6xl text-center font-black text-gray-900 leading-tight">
+              Pricing That
+              <span className="bg-gradient-to-b from-[#C848C1] to-[#54A6F9] bg-clip-text text-transparent">
+                {" "}
+                Delivers Results
+              </span>
+            </h1>
+            <p className="text-lg md:text-xl font-extralight text-center max-w-3xl text-gray-600 leading-relaxed">
+              Choose the perfect package to elevate your brand and dominate your
+              market. Every service is designed to deliver measurable results
+              and exceptional ROI.
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Services Grid */}
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {services.map((service, index) => (
-            <div
-              key={index}
-              className={`relative group ${
-                service.featured ? "xl:scale-105 z-10" : ""
-              }`}
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
-            >
-              {/* Featured Badge */}
-              {service.featured && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
-                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
-                    ⭐ {service.badge}
-                  </div>
-                </div>
-              )}
-
-              {/* Card */}
+        {/* Services Grid */}
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {services.map((service, index) => (
               <div
-                className={`relative bg-white rounded-3xl p-8 h-full transition-all duration-500 ${
-                  service.shadowColor
-                } ${
-                  hoveredIndex === index
-                    ? "shadow-2xl -translate-y-2"
-                    : "shadow-lg"
-                } border border-gray-100 flex flex-col`}
+                key={index}
+                className={`relative group ${
+                  service.featured ? "xl:scale-105 z-10" : ""
+                }`}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
               >
-                {/* Top Badge */}
-                {!service.featured && (
-                  <div className="absolute -top-2 -right-2">
-                    <div
-                      className={`bg-gradient-to-r ${service.gradient} text-white px-3 py-1 rounded-full text-xs font-bold`}
-                    >
-                      {service.badge}
+                {/* Featured Badge */}
+                {service.featured && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
+                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+                      ⭐ {service.badge}
                     </div>
                   </div>
                 )}
 
-                {/* Icon */}
-                <div className="text-center mb-6">{service.icon}</div>
-
-                {/* Title & Subtitle */}
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                    {service.title}
-                  </h3>
-                  <p className="text-gray-500 text-sm font-medium">
-                    {service.subtitle}
-                  </p>
-                </div>
-
-                {/* Price */}
-                <div className="text-center mb-6">
-                  <div className="flex items-center justify-center mb-2">
-                    <span className="text-4xl font-black text-gray-900">
-                      {service.price}
-                    </span>
-                    <span className="text-gray-500 ml-1">{service.period}</span>
-                  </div>
-                  {service.originalPrice && (
-                    <div className="text-gray-400 line-through text-sm">
-                      {service.originalPrice}
+                {/* Card */}
+                <div
+                  className={`relative bg-white rounded-3xl p-8 h-full transition-all duration-500 ${
+                    service.shadowColor
+                  } ${
+                    hoveredIndex === index
+                      ? "shadow-2xl -translate-y-2"
+                      : "shadow-lg"
+                  } border border-gray-100 flex flex-col`}
+                >
+                  {/* Top Badge */}
+                  {!service.featured && (
+                    <div className="absolute -top-2 -right-2">
+                      <div
+                        className={`bg-gradient-to-r ${service.gradient} text-white px-3 py-1 rounded-full text-xs font-bold`}
+                      >
+                        {service.badge}
+                      </div>
                     </div>
                   )}
-                </div>
 
-                {/* Description */}
-                <p className="text-gray-600 text-center mb-6 leading-relaxed">
-                  {service.description}
-                </p>
+                  {/* Icon */}
+                  <div className="text-center mb-6">{service.icon}</div>
 
-                {/* Features */}
-                <div className="mb-8 flex-grow">
-                  <h4 className="font-semibold text-gray-900 mb-3">
-                    What's Included:
-                  </h4>
-                  <ul className="space-y-2">
-                    {service.features.map((feature, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-center text-sm text-gray-600"
-                      >
-                        <FaCheck className="text-green-500 mr-3 flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* CTA Button */}
-                <div className="mt-auto">
-                  <button
-                    onClick={() => openModal(service)}
-                    className={`w-full bg-gradient-to-r ${service.gradient} text-white py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-lg hover:scale-105 group-hover:shadow-xl flex items-center justify-center`}
-                  >
-                    Get Started Now
-                    <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-          <div
-            className="absolute inset-0 bg-black/80"
-            onClick={closeModal} // click outside to close
-          ></div>
-          <div className="relative bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto z-10">
-            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              {/* Modal Header */}
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900">
-                      {selectedService?.title}
-                    </h2>
-                    <p className="text-gray-500 text-sm">
-                      {selectedService?.price} {selectedService?.period}
+                  {/* Title & Subtitle */}
+                  <div className="text-center mb-6">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      {service.title}
+                    </h3>
+                    <p className="text-gray-500 text-sm font-medium">
+                      {service.subtitle}
                     </p>
                   </div>
-                  <button
-                    onClick={closeModal}
-                    className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                  >
-                    <FaTimes className="text-xl" />
-                  </button>
+
+                  {/* Price */}
+                  <div className="text-center mb-6">
+                    <div className="flex items-center justify-center mb-2">
+                      <span className="text-4xl font-black text-gray-900">
+                        {service.price}
+                      </span>
+                      <span className="text-gray-500 ml-1">
+                        {service.period}
+                      </span>
+                    </div>
+                    {service.originalPrice && (
+                      <div className="text-gray-400 line-through text-sm">
+                        {service.originalPrice}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-gray-600 text-center mb-6 leading-relaxed">
+                    {service.description}
+                  </p>
+
+                  {/* Features */}
+                  <div className="mb-8 flex-grow">
+                    <h4 className="font-semibold text-gray-900 mb-3">
+                      What's Included:
+                    </h4>
+                    <ul className="space-y-2">
+                      {service.features.map((feature, idx) => (
+                        <li
+                          key={idx}
+                          className="flex items-center text-sm text-gray-600"
+                        >
+                          <FaCheck className="text-green-500 mr-3 flex-shrink-0" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* CTA Button */}
+                  <div className="mt-auto">
+                    <button
+                      onClick={() => openModal(service)}
+                      className={`w-full bg-gradient-to-r ${service.gradient} text-white py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-lg hover:scale-105 group-hover:shadow-xl flex items-center justify-center`}
+                    >
+                      Get Started Now
+                      <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                    </button>
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
 
-              {/* Modal Body */}
-              <div className="p-6">
-                {renderFormFields()}
+        {/* Modal */}
+        {modalOpen && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div
+              className="absolute inset-0 bg-black/20"
+              onClick={closeModal} // click outside to close
+            ></div>
+            <div className="relative bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto z-10 custom-scrollbar">
+              <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar">
+                {/* Modal Header */}
+                <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl z-20">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">
+                        {selectedService?.title}
+                      </h2>
+                      <p className="text-gray-500 text-sm">
+                        {selectedService?.price} {selectedService?.period}
+                      </p>
+                    </div>
+                    <button
+                      onClick={closeModal}
+                      className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-2 hover:bg-gray-100 rounded-full"
+                    >
+                      <FaTimes className="text-xl" />
+                    </button>
+                  </div>
+                </div>
 
-                {/* Submit Button */}
-                <div className="flex gap-4 pt-4">
-                  <button
-                    type="button"
-                    onClick={closeModal}
-                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSubmit}
-                    className={`flex-1 px-6 py-3 bg-gradient-to-r ${selectedService?.gradient} text-white rounded-lg hover:shadow-lg transition-all duration-300 font-semibold`}
-                  >
-                    Send via WhatsApp
-                  </button>
+                {/* Modal Body */}
+                <div className="py-2 px-4">
+                  {renderFormFields()}
+
+                  {/* Submit Button */}
+                  <div className="flex gap-4 sticky bottom-3 bg-white pt-4 border-t border-gray-100">
+                    <button
+                      type="button"
+                      onClick={closeModal}
+                      className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      disabled={isSubmitting}
+                      className={`flex-1 px-6 py-3 bg-gradient-to-r ${
+                        selectedService?.gradient
+                      } text-white rounded-lg transition-all duration-300 font-semibold flex items-center justify-center ${
+                        isSubmitting
+                          ? "opacity-70 cursor-not-allowed"
+                          : "hover:shadow-lg"
+                      }`}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <svg
+                            className="animate-spin h-5 w-5 mr-2 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                            ></path>
+                          </svg>
+                          Sending...
+                        </>
+                      ) : (
+                        "Send via WhatsApp"
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+
+      {/* Custom Scrollbar Styles */}
+      <style jsx>{`
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+          border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: linear-gradient(
+            45deg,
+            rgba(59, 130, 246, 0.3),
+            rgba(147, 51, 234, 0.3)
+          );
+          border-radius: 10px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          transition: all 0.3s ease;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(
+            45deg,
+            rgba(59, 130, 246, 0.6),
+            rgba(147, 51, 234, 0.6)
+          );
+          transform: scale(1.1);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:active {
+          background: linear-gradient(
+            45deg,
+            rgba(59, 130, 246, 0.8),
+            rgba(147, 51, 234, 0.8)
+          );
+        }
+
+        /* Hide scrollbar for mobile devices */
+        @media (max-width: 768px) {
+          .custom-scrollbar::-webkit-scrollbar {
+            width: 0px;
+            height: 0px;
+          }
+
+          .custom-scrollbar {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+        }
+
+        /* Smooth scrolling behavior */
+        .custom-scrollbar {
+          scroll-behavior: smooth;
+        }
+
+        /* Custom focus styles for better accessibility */
+        .custom-scrollbar:focus-within::-webkit-scrollbar-thumb {
+          background: linear-gradient(
+            45deg,
+            rgba(59, 130, 246, 0.7),
+            rgba(147, 51, 234, 0.7)
+          );
+        }
+      `}</style>
+    </>
   );
 }

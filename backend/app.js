@@ -7,6 +7,7 @@ const chatRoutes = require("./Routes/chatRoutes");
 const sessionRoutes = require("./Routes/sessionRoutes");
 const blogRoutes = require("./Routes/blogRoutes");
 const mailRoutes = require("./Routes/mailRoutes");
+const pricingRoutes = require("./Routes/pricingRoutes");
 
 const fileUpload = require("express-fileupload");
 
@@ -37,5 +38,6 @@ app.use("/admin", chatRoutes);
 app.use("/admin", sessionRoutes);
 app.use("/admin", mailRoutes);
 app.use("/admin", blogRoutes);
+app.use("/admin", pricingRoutes);
 
 module.exports = app;

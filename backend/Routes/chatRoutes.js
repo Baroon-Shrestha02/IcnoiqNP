@@ -5,7 +5,7 @@ const {
   getMessagesBySession,
   getAllSessions,
   getAllSessionsWithUsernames,
-} = require("../Controllers/ChatController");
+} = require("../Controllers/chatController");
 const { verifyAdmin } = require("../MIddlewares/verifyAdmin");
 
 const router = express.Router();
